@@ -1,8 +1,10 @@
 package cores
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -43,4 +45,43 @@ func ClearDocument(path string) {
 
 	file.Truncate(0)
 	defer file.Close()
+}
+
+// 给文档替换
+func ReplaceDocument(old string, new string, TxtPath string) {
+	file, err := os.OpenFile(TxtPath, os.O_RDWR|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Println("打开修改TXT失败", err)
+	}
+
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	var newText string
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		newLine := strings.Replace(line, old, new, -1)
+		newText += newLine + "\n"
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("读取文件失败:", err)
+		return
+	}
+
+	if err := file.Truncate(0); err != nil {
+		fmt.Println("清空文件内容失败:", err)
+		return
+	}
+
+	if _, err := file.Seek(0, 0); err != nil {
+		fmt.Println("移动文件指针失败:", err)
+		return
+	}
+
+	if _, err := file.WriteString(newText); err != nil {
+		fmt.Println("写入新内容失败:", err)
+		return
+	}
+
 }

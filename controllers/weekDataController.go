@@ -17,7 +17,7 @@ type WeekDataController struct {
 	F             *excelize.File
 }
 
-func NewWeekDataController(CompanyAmount int, HouseAmount int, ExcelPath string) *WeekDataController {
+func NewWeekDataController(CompanyAmount int, HouseAmount int, ExcelPath string, TxtPath string) *WeekDataController {
 	return &WeekDataController{
 		WeekService: &service.WeekDataService{
 			ThisWeekData:         models.ThisWeekDataMap,
@@ -26,7 +26,7 @@ func NewWeekDataController(CompanyAmount int, HouseAmount int, ExcelPath string)
 			ThisHouseData:        models.ThisHouseData,
 			ThisHouseDataValue:   &models.ThisHouseDataValue,
 			LastHouseDataValue:   &models.LastHouseDataValue,
-			TxtPath:              "document/weekDataReport.txt",
+			TxtPath:              TxtPath,
 		},
 
 		TableName:     "Sheet1",

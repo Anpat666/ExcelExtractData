@@ -2,6 +2,7 @@ package views
 
 import (
 	"data/controllers"
+	"data/cores"
 	"fmt"
 )
 
@@ -11,6 +12,7 @@ type User struct {
 	GameAmount    int
 	CompanyAmount int
 	ExcelPath     string
+	TxtPath       string
 }
 
 func MenuView() {
@@ -55,9 +57,31 @@ func (u *User) weekData() {
 	u.HouseAmount = 30 + u.HouseAmount*4
 
 	u.ExcelPath = "document/周报数据表.xlsx"
-	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath)
+	u.TxtPath = "document/weekDataReport.txt"
+	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	week.WeekDataUser()
+}
+
+func (u *User) monData() {
+	fmt.Println("-------正在进行初始化------")
+
+	fmt.Println("在document文件中必须存在《月报数据表.xlsx》，文件名必须正确")
+
+	fmt.Printf("请输入需要制作的公司层级数量：")
+	fmt.Scanln(&u.CompanyAmount)
+	u.CompanyAmount = 2 + u.CompanyAmount*4
+
+	fmt.Printf("请输入需要制作的房间统计数量：")
+	fmt.Scanln(&u.HouseAmount)
+	u.HouseAmount = 30 + u.HouseAmount*4
+
+	u.ExcelPath = "document/月报数据表.xlsx"
+	u.TxtPath = "document/monDataReport.txt"
+	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
+
+	week.WeekDataUser()
+	cores.ReplaceDocument("周", "月", u.TxtPath)
 }
 
 func (u *User) ChooseMenu() {
@@ -75,6 +99,9 @@ func (u *User) ChooseMenu() {
 			fmt.Println("已制作完成，请在document文件夹打开<weekDataReport.txt>获取")
 			return
 		case 3:
+			u.monData()
+			fmt.Println("已制作完成，请在document文件夹打开<monDataReport.txt>获取")
+			return
 		case 4:
 			fmt.Println("已退出，请关闭")
 			return
