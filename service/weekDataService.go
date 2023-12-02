@@ -8,15 +8,22 @@ import (
 type WeekDataService struct {
 	ThisWeekData         map[string]string
 	ThisWeekDataMapValue *map[string]string
-	LastWeekData         map[string]string
 	LastWeekDataMapValue *map[string]string
+	ThisHouseData        map[string]string
+	ThisHouseDataValue   *map[string]string
+	LastHouseDataValue   *map[string]string
 	Content              string
 	TxtPath              string
 	Link                 string
 	ThisData             string
 	LastData             string
 	DepSubWith           string
-	ContentSlices        []string
+	PerCapDep            string
+	PerCapBet            string
+	StrBetTotal          string
+	StrWinOrlose         string
+	StrDeposit           string
+	StrWithdrawal        string
 }
 
 func (w *WeekDataService) WeekDataFormatContent() {
@@ -104,4 +111,53 @@ func (w *WeekDataService) WeekDataFormatContent() {
 	w.Content = fmt.Sprintf("15、营销活动%s，返水%s,返佣%s。\n", (*w.ThisWeekDataMapValue)["Active"], (*w.ThisWeekDataMapValue)["ReturnWater"], (*w.ThisWeekDataMapValue)["Commission"])
 	cores.UpDataReport(w.Content, w.TxtPath)
 
+}
+
+func (w *WeekDataService) WeekHouseFormatContent() {
+	w.Content = fmt.Sprintf("--------%s--------\n", (*w.ThisHouseDataValue)["HouseName"])
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = fmt.Sprintf("1、新增会员%s人，周活跃人数%s人，周投注人数%s人。\n",
+		(*w.ThisHouseDataValue)["PlayerAdd"], (*w.ThisHouseDataValue)["PlayerActive"], (*w.ThisHouseDataValue)["PlayerBeting"])
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.PerCapDep = cores.PerCapitaStatistics((*w.ThisHouseDataValue)["Deposit"], (*w.ThisHouseDataValue)["PlayerDeposit"])
+	w.PerCapBet = cores.PerCapitaStatistics((*w.ThisHouseDataValue)["BetTotal"], (*w.ThisHouseDataValue)["PlayerBeting"])
+	w.PerCapDep = cores.TransitionData(w.PerCapDep)
+	w.PerCapBet = cores.TransitionData(w.PerCapBet)
+	w.Content = fmt.Sprintf("2、人均存款金额%s，人均投注量%s。\n", w.PerCapDep, w.PerCapBet)
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.StrBetTotal = cores.TransitionData((*w.ThisHouseDataValue)["BetTotal"])
+	w.StrWinOrlose = cores.TransitionWinOrLose((*w.ThisHouseDataValue)["WinOrLose"])
+	w.Content = fmt.Sprintf("3、总投注%s，游戏%s。\n", w.StrBetTotal, w.StrWinOrlose)
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.StrDeposit = cores.TransitionData((*w.ThisHouseDataValue)["Deposit"])
+	w.StrWithdrawal = cores.TransitionData((*w.ThisHouseDataValue)["Withdrawal"])
+	w.DepSubWith = cores.DepositsSubWithdrawal((*w.ThisHouseDataValue)["Deposit"], (*w.ThisHouseDataValue)["Withdrawal"])
+	w.DepSubWith = cores.TransitionData(w.DepSubWith)
+	w.Link = cores.DepositsAndBetProportion((*w.ThisHouseDataValue)["Deposit"], (*w.ThisHouseDataValue)["BetTotal"])
+	w.Content = fmt.Sprintf("4、总存款%s，总取款%s，存提差%s，充投比%s。\n", w.StrDeposit, w.StrWithdrawal, w.DepSubWith, w.Link)
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	(*w.ThisHouseDataValue)["Active"] = cores.TransitionData((*w.ThisHouseDataValue)["Active"])
+	(*w.ThisHouseDataValue)["ReturnWater"] = cores.TransitionData((*w.ThisHouseDataValue)["ReturnWater"])
+	w.Content = fmt.Sprintf("5、营销活动%s，返水%s。\n", (*w.ThisHouseDataValue)["Active"], (*w.ThisHouseDataValue)["ReturnWater"])
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	(*w.ThisHouseDataValue)["ProfitAndLoss"] = cores.TransitionWinOrLose((*w.ThisHouseDataValue)["ProfitAndLoss"])
+	w.Content = fmt.Sprintf("6、总%s \n", (*w.ThisHouseDataValue)["ProfitAndLoss"])
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	PlayerAddLink := cores.ComparisonTool((*w.LastHouseDataValue)["PlayerAdd"], (*w.ThisHouseDataValue)["PlayerAdd"])
+	PlayerActiveLink := cores.ComparisonTool((*w.LastHouseDataValue)["PlayerActive"], (*w.ThisHouseDataValue)["PlayerActive"])
+	PlayerBetingLink := cores.ComparisonTool((*w.LastHouseDataValue)["PlayerBeting"], (*w.ThisHouseDataValue)["PlayerBeting"])
+	DepositLink := cores.ComparisonTool((*w.LastHouseDataValue)["Deposit"], (*w.ThisHouseDataValue)["Deposit"])
+	BetTotalLink := cores.ComparisonTool((*w.LastHouseDataValue)["BetTotal"], (*w.ThisHouseDataValue)["BetTotal"])
+	w.Content = fmt.Sprintf(
+		"7、本周相比上周数据，新增会员数%s,活跃人数%s,投注人数%s,存款数据%s,投注数据%s。\n",
+		PlayerAddLink, PlayerActiveLink, PlayerBetingLink, DepositLink, BetTotalLink,
+	)
+	cores.UpDataReport(w.Content, w.TxtPath)
 }

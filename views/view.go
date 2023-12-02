@@ -52,6 +52,7 @@ func (u *User) weekData() {
 
 	fmt.Printf("请输入需要制作的房间统计数量：")
 	fmt.Scanln(&u.HouseAmount)
+	u.HouseAmount = 30 + u.HouseAmount*4
 
 	u.ExcelPath = "document/周报数据表.xlsx"
 	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath)

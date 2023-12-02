@@ -23,6 +23,9 @@ func NewWeekDataController(CompanyAmount int, HouseAmount int, ExcelPath string)
 			ThisWeekData:         models.ThisWeekDataMap,
 			ThisWeekDataMapValue: &models.ThisWeekDataMapValue,
 			LastWeekDataMapValue: &models.LastWeekDataMapValue,
+			ThisHouseData:        models.ThisHouseData,
+			ThisHouseDataValue:   &models.ThisHouseDataValue,
+			LastHouseDataValue:   &models.LastHouseDataValue,
 			TxtPath:              "document/weekDataReport.txt",
 		},
 
@@ -48,5 +51,24 @@ func (w *WeekDataController) WeekDataUser() {
 		}
 		w.WeekService.WeekDataFormatContent()
 		i += 3
+	}
+
+	for j := 28; j <= w.HouseAmount; j++ {
+		for k, v := range w.WeekService.ThisHouseData {
+			element := fmt.Sprintf("%s%v", v, j)
+			value := cores.GetExcelValue(w.F, w.TableName, element)
+			(*w.WeekService.ThisHouseDataValue)[k] = value
+
+			element = fmt.Sprintf("%s%v", v, j-1)
+			value = cores.GetExcelValue(w.F, w.TableName, element)
+			(*w.WeekService.LastHouseDataValue)[k] = value
+
+		}
+		w.WeekService.WeekHouseFormatContent()
+		if j == 40 || j == 55 {
+			j += 6
+			continue
+		}
+		j += 3
 	}
 }
