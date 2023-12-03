@@ -2,10 +2,12 @@ package service
 
 import (
 	"data/cores"
+	"data/models"
 	"fmt"
 )
 
 type WeekDataService struct {
+	WeekGame             *models.GameWeek
 	ThisWeekData         map[string]string
 	ThisWeekDataMapValue *map[string]string
 	LastWeekDataMapValue *map[string]string

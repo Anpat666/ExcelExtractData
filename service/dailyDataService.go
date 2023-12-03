@@ -86,10 +86,10 @@ func (s *ServiceDailyData) FormatDailyDataContent() {
 	cores.UpDataReport(s.Content, s.TxtPath)
 }
 
-func (s *ServiceDailyData) FormatGameContent() {
-	BetTotal := cores.TransitionData(s.GameData.BetTotal)
-	WinOrLose := cores.TransitionWinOrLose(s.GameData.WinOrLose)
-	s.Content = fmt.Sprintf("%s:有效投注%s,%s \n", s.GameData.GameName, BetTotal, WinOrLose)
+func (s *ServiceDailyData) FormatGameContent(GameName string, BetTotal string, WinOrLose string) {
+	BetTotal = cores.TransitionData(BetTotal)
+	WinOrLose = cores.TransitionWinOrLose(WinOrLose)
+	s.Content = fmt.Sprintf("%s:有效投注%s,%s \n", GameName, BetTotal, WinOrLose)
 
 	cores.UpDataReport(s.Content, s.TxtPath)
 }

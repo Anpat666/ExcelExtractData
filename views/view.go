@@ -9,7 +9,7 @@ import (
 type User struct {
 	Choose        int
 	HouseAmount   int
-	GameAmount    int
+	GameChoose    int
 	CompanyAmount int
 	ExcelPath     string
 	TxtPath       string
@@ -27,20 +27,33 @@ func MenuView() {
 
 func (u *User) dailyData() {
 	fmt.Println("-------正在进行初始化------")
-
 	fmt.Println("在document文件中必须存在《下级代理帐变报表.xlsx》，文件名必须正确")
-
 	fmt.Printf("请输入需要制作的子公司+房主数量：")
 	fmt.Scanln(&u.HouseAmount)
 	u.HouseAmount++
 
-	fmt.Printf("请输入需要制作的游戏统计数量：")
-	fmt.Scanln(&u.GameAmount)
-
 	u.ExcelPath = "document/下级代理帐变报表.xlsx"
-	daily := controllers.NewDailyDataController(u.HouseAmount, u.GameAmount, u.ExcelPath)
+	u.TxtPath = "document/dailyDataReport.txt"
+	daily := controllers.NewDailyDataController(u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	daily.DailyDataUser()
+	cores.ReplaceDocument("分公司", "房主", u.TxtPath, 4)
+
+	for {
+		fmt.Printf("是否需要制作游戏输赢统计(输入1需要或者输入2不需要)：")
+		fmt.Scanln(&u.GameChoose)
+		if u.GameChoose == 1 || u.GameChoose == 2 {
+			if u.GameChoose == 1 {
+				daily.GamesDailyData()
+				break
+			} else {
+				break
+			}
+		} else {
+			fmt.Println("选择有误，请重新输入")
+		}
+	}
+
 }
 
 func (u *User) weekData() {
@@ -81,7 +94,7 @@ func (u *User) monData() {
 	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	week.WeekDataUser()
-	cores.ReplaceDocument("周", "月", u.TxtPath)
+	cores.ReplaceDocument("周", "月", u.TxtPath, 0)
 }
 
 func (u *User) ChooseMenu() {

@@ -48,8 +48,8 @@ func ClearDocument(path string) {
 }
 
 // 给文档替换
-func ReplaceDocument(old string, new string, TxtPath string) {
-	file, err := os.OpenFile(TxtPath, os.O_RDWR|os.O_APPEND, 0644)
+func ReplaceDocument(old string, new string, TxtPath string, startLint int) {
+	file, err := os.OpenFile(TxtPath, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		fmt.Println("打开修改TXT失败", err)
 	}
@@ -57,11 +57,19 @@ func ReplaceDocument(old string, new string, TxtPath string) {
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	var newText string
+	lineNumber := 0
 
 	for scanner.Scan() {
+		lineNumber++
 		line := scanner.Text()
-		newLine := strings.Replace(line, old, new, -1)
-		newText += newLine + "\n"
+
+		if lineNumber >= startLint {
+			newLine := strings.Replace(line, old, new, -1)
+			newText += newLine + "\n"
+		} else {
+			newText += line + "\n"
+		}
+
 	}
 
 	if err := scanner.Err(); err != nil {

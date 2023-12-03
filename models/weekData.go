@@ -1,5 +1,10 @@
 package models
 
+type GameWeek struct {
+	ThisGame [][]string
+	LastGame [][]string
+}
+
 var ThisWeekDataMap = map[string]string{
 	"HouseName":         "A", //房间名字
 	"HouseCard":         "C", //有效房卡

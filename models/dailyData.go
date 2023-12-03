@@ -26,13 +26,7 @@ type DailyDataElement struct {
 }
 
 type GameData struct {
-	GameName  string //游戏名字
-	BetTotal  string //有效投注
-	WinOrLose string //游戏输赢
-}
-
-type GameElement struct {
-	GameName  string //游戏名字
-	BetTotal  string //有效投注
-	WinOrLose string //游戏输赢
+	G7Rows [][]string
+	YYRows [][]string
+	BYRows [][]string
 }

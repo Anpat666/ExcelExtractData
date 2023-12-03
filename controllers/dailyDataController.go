@@ -10,30 +10,25 @@ import (
 )
 
 type DailyDataController struct {
-	DailyElement  *models.DailyDataElement
-	DailyService  *service.ServiceDailyData
-	GameElement   *models.GameElement
-	TableName     string
-	GameTableName string
-	HouseAmount   int
-	GameAmount    int
-	F             *excelize.File
+	DailyElement *models.DailyDataElement
+	DailyService *service.ServiceDailyData
+	TableName    string
+	HouseAmount  int
+	F            *excelize.File
 }
 
-func NewDailyDataController(HouseAmount int, GameAmount int, ExcelPath string) *DailyDataController {
+func NewDailyDataController(HouseAmount int, ExcelPath string, TxtPath string) *DailyDataController {
 	return &DailyDataController{
 		DailyElement: &models.DailyDataElement{},
 		DailyService: &service.ServiceDailyData{
 			DailyData: &models.DailyData{},
 			GameData:  &models.GameData{},
-			TxtPath:   "document/dailyDataReport.txt",
+			TxtPath:   TxtPath,
 		},
-		GameElement:   &models.GameElement{},
-		TableName:     "SheetJS",
-		GameTableName: "Sheet1",
-		HouseAmount:   HouseAmount,
-		GameAmount:    GameAmount,
-		F:             cores.OpenExcel(ExcelPath),
+
+		TableName:   "SheetJS",
+		HouseAmount: HouseAmount,
+		F:           cores.OpenExcel(ExcelPath),
 	}
 }
 
@@ -74,19 +69,37 @@ func (D *DailyDataController) DailyDataUser() {
 		D.DailyService.GetProfitAndLoss()
 
 		D.DailyService.FormatDailyDataContent()
+	}
+}
 
+func (D *DailyDataController) GamesDailyData() {
+	D.DailyService.GameData.G7Rows = cores.GetExcelRows(D.F, "G7")
+	D.DailyService.GameData.YYRows = cores.GetExcelRows(D.F, "YY")
+	D.DailyService.GameData.BYRows = cores.GetExcelRows(D.F, "BY")
+
+	cores.GamesDataSort(D.DailyService.GameData.G7Rows, 5)
+	cores.GamesDataSort(D.DailyService.GameData.YYRows, 5)
+	cores.GamesDataSort(D.DailyService.GameData.BYRows, 5)
+
+	cores.Slicing(&D.DailyService.GameData.G7Rows, 3, 3)
+	cores.Slicing(&D.DailyService.GameData.YYRows, 3, 3)
+	cores.Slicing(&D.DailyService.GameData.BYRows, 3, 3)
+
+	D.DailyService.Content = "------G7每日游戏输赢-------\n"
+	cores.UpDataReport(D.DailyService.Content, D.DailyService.TxtPath)
+	for _, v := range D.DailyService.GameData.G7Rows {
+		D.DailyService.FormatGameContent(v[0], v[6], v[5])
+	}
+	D.DailyService.Content = "------YY每日游戏输赢-------\n"
+	cores.UpDataReport(D.DailyService.Content, D.DailyService.TxtPath)
+	for _, v := range D.DailyService.GameData.YYRows {
+		D.DailyService.FormatGameContent(v[0], v[6], v[5])
 	}
 
-	for k := 1; k <= D.GameAmount; k++ {
-		D.GameElement.GameName = fmt.Sprintf("A%v", k)
-		D.DailyService.GameData.GameName = cores.GetExcelValue(D.F, D.GameTableName, D.GameElement.GameName)
-
-		D.GameElement.BetTotal = fmt.Sprintf("B%v", k)
-		D.DailyService.GameData.BetTotal = cores.GetExcelValue(D.F, D.GameTableName, D.GameElement.BetTotal)
-
-		D.GameElement.WinOrLose = fmt.Sprintf("C%v", k)
-		D.DailyService.GameData.WinOrLose = cores.GetExcelValue(D.F, D.GameTableName, D.GameElement.WinOrLose)
-
-		D.DailyService.FormatGameContent()
+	D.DailyService.Content = "------BY每日游戏输赢-------\n"
+	cores.UpDataReport(D.DailyService.Content, D.DailyService.TxtPath)
+	for _, v := range D.DailyService.GameData.BYRows {
+		D.DailyService.FormatGameContent(v[0], v[6], v[5])
 	}
+
 }

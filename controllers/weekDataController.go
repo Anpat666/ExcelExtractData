@@ -72,3 +72,8 @@ func (w *WeekDataController) WeekDataUser() {
 		j += 3
 	}
 }
+
+func (D *WeekDataController) GameWeekData() {
+	D.WeekService.WeekGame.ThisGame = cores.GetExcelCols(D.F, "本周游戏数据")
+	D.WeekService.WeekGame.LastGame = cores.GetExcelCols(D.F, "上周游戏数据")
+}

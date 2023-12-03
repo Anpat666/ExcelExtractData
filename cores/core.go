@@ -16,6 +16,24 @@ func GetExcelValue(f *excelize.File, tableName string, element string) string {
 	return cell
 }
 
+// 提取行数据
+func GetExcelRows(f *excelize.File, tableName string) [][]string {
+	rows, err := f.GetRows(tableName)
+	if err != nil {
+		fmt.Println("表格获取列元素失败：", tableName, err)
+	}
+	return rows
+}
+
+// 提取列数据
+func GetExcelCols(f *excelize.File, tableName string) [][]string {
+	rows, err := f.GetCols(tableName)
+	if err != nil {
+		fmt.Println("表格获取列元素失败：", tableName, err)
+	}
+	return rows
+}
+
 // 转换判定 100以上格式化输出加万 100以下直接格式化输出加元
 func TransitionData(data string) string {
 	datafloat, _ := strconv.ParseFloat(data, 64)
@@ -82,4 +100,23 @@ func IsCompanyWinOrLose(dataStr string) string {
 		strdata := fmt.Sprintf("总亏损%s万（分公司亏钱）", sdata)
 		return strdata
 	}
+}
+
+// 游戏输赢冒泡排序
+func GamesDataSort(data [][]string, row int) {
+	for i := 0; i < len(data)-1; i++ {
+		for k := i + 1; k < len(data); k++ {
+			numI, _ := strconv.ParseFloat(data[i][row], 64)
+			numK, _ := strconv.ParseFloat(data[k][row], 64)
+
+			if numI < numK {
+				data[i], data[k] = data[k], data[i]
+			}
+		}
+	}
+}
+
+// 操作原始切片
+func Slicing(data *[][]string, first int, last int) {
+	*data = append((*data)[:first], (*data)[len(*data)-last:]...)
 }
