@@ -6,6 +6,6 @@ import (
 
 func main() {
 
-	user := views.User{}
+	user := views.UserView{}
 	user.ChooseMenu()
 }

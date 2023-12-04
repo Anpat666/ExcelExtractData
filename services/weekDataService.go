@@ -85,8 +85,8 @@ func (D *WeekDataService) GameWeekData() {
 	D.WeekController.WeekGame.ThisGame = cores.GetExcelCols(D.F, D.ThisTableName)
 	D.WeekController.WeekGame.LastGame = cores.GetExcelCols(D.F, D.LastTableName)
 
-	cores.WeekGamesDataExcel(D.WeekController.WeekGame.ThisGame, D.WeekController.WeekGame.LastGame)
-	newRows, Totalrows := cores.GamesExcelSort()
+	cores.MakeNewDataExcel(D.WeekController.WeekGame.ThisGame, D.WeekController.WeekGame.LastGame)
+	newRows, Totalrows := cores.GamesDataExcelSort()
 	D.F = cores.OpenExcel("Book1.xlsx")
 
 	// 获取投注量  名称+百分比
@@ -105,7 +105,7 @@ func (D *WeekDataService) GameWeekData() {
 	}
 
 	//获取输赢 前3+后3 名字
-	newGamesData := cores.GetExcelRows(D.F, "Sheet1")
+	newGamesData := cores.GetExcelRows(D.F, D.TableName)
 	winRoLoseNew := make([][]string, len(newGamesData)-2)
 	copy(winRoLoseNew, newGamesData[2:])
 	cores.GamesDataSort(winRoLoseNew, 7)

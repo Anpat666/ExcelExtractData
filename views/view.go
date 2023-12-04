@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-type User struct {
+type UserView struct {
 	Choose        int
 	HouseAmount   int
 	GameChoose    int
@@ -27,7 +27,7 @@ func MenuView() {
 	fmt.Print("请输入：")
 }
 
-func (u *User) dailyData() {
+func (u *UserView) dailyDataView() {
 	fmt.Println("-------正在进行初始化------")
 	fmt.Println("在document文件中必须存在《下级代理帐变报表.xlsx》，文件名必须正确")
 	fmt.Printf("请输入需要制作的子公司+房主数量：")
@@ -58,7 +58,7 @@ func (u *User) dailyData() {
 
 }
 
-func (u *User) weekData() {
+func (u *UserView) weekDataView() {
 	fmt.Println("-------正在进行初始化------")
 
 	fmt.Println("在document文件中必须存在《周报数据表.xlsx》，文件名必须正确")
@@ -92,7 +92,7 @@ func (u *User) weekData() {
 
 }
 
-func (u *User) monData() {
+func (u *UserView) monDataView() {
 	fmt.Println("-------正在进行初始化------")
 
 	fmt.Println("在document文件中必须存在《月报数据表.xlsx》，文件名必须正确")
@@ -127,22 +127,22 @@ func (u *User) monData() {
 	cores.ReplaceDocument("周", "月", u.TxtPath, 0)
 }
 
-func (u *User) ChooseMenu() {
+func (u *UserView) ChooseMenu() {
 
 	for {
 		MenuView()
 		fmt.Scanln(&u.Choose)
 		switch u.Choose {
 		case 1:
-			u.dailyData()
+			u.dailyDataView()
 			fmt.Println("已制作完成，请在document文件夹打开<dailyDataReport.txt>获取")
 			return
 		case 2:
-			u.weekData()
+			u.weekDataView()
 			fmt.Println("已制作完成，请在document文件夹打开<weekDataReport.txt>获取")
 			return
 		case 3:
-			u.monData()
+			u.monDataView()
 			fmt.Println("已制作完成，请在document文件夹打开<monDataReport.txt>获取")
 			return
 		case 4:

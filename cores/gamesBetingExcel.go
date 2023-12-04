@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func WeekGamesDataExcel(this [][]string, last [][]string) {
+func MakeNewDataExcel(this [][]string, last [][]string) {
 
 	f := excelize.NewFile()
 	defer func() {
@@ -131,7 +131,7 @@ func WeekGamesDataExcel(this [][]string, last [][]string) {
 
 }
 
-func GamesExcelSort() ([][]string, [][]string) {
+func GamesDataExcelSort() ([][]string, [][]string) {
 	Sheet2 := "Sheet2"
 	f := OpenExcel("Book1.xlsx")
 	rows, err := f.GetRows(Sheet2)
