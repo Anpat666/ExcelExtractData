@@ -3,103 +3,93 @@ package controllers
 import (
 	"data/cores"
 	"data/models"
-	"data/service"
 	"fmt"
-
-	"github.com/xuri/excelize/v2"
+	"strconv"
 )
 
 type DailyDataController struct {
-	DailyElement *models.DailyDataElement
-	DailyService *service.ServiceDailyData
-	TableName    string
-	HouseAmount  int
-	F            *excelize.File
+	DailyData     *models.DailyData
+	GameData      *models.GameData
+	ActiveAounmt  string //优惠返佣返水总和
+	WinOrLose     string //游戏输赢
+	ProfitAndLoss string //总盈亏
+	Content       string //输出内容
+	TxtPath       string //写入的路径
+	ExcelPath     string //读取Excel路径
 }
 
-func NewDailyDataController(HouseAmount int, ExcelPath string, TxtPath string) *DailyDataController {
-	return &DailyDataController{
-		DailyElement: &models.DailyDataElement{},
-		DailyService: &service.ServiceDailyData{
-			DailyData: &models.DailyData{},
-			GameData:  &models.GameData{},
-			TxtPath:   TxtPath,
-		},
-
-		TableName:   "SheetJS",
-		HouseAmount: HouseAmount,
-		F:           cores.OpenExcel(ExcelPath),
+// 返水+活动营销+代理返佣
+func (s *DailyDataController) GetActiveAounmt() {
+	rwFloat, err := strconv.ParseFloat(s.DailyData.ReturnWater, 64)
+	if err != nil {
+		fmt.Println("返水转化Float64类型错误", err)
 	}
+
+	ActiveFloat, err2 := strconv.ParseFloat(s.DailyData.Active, 64)
+	if err2 != nil {
+		fmt.Println("营销活动转化Float64类型错误", err2)
+	}
+
+	ComFloat, err3 := strconv.ParseFloat(s.DailyData.Commission, 64)
+	if err3 != nil {
+		fmt.Println("代理返佣转化Float64类型错误", err3)
+	}
+
+	ActiveAounmt := rwFloat + ActiveFloat + ComFloat
+	s.ActiveAounmt = strconv.FormatFloat(ActiveAounmt, 'f', -1, 64)
 }
 
-func (D *DailyDataController) DailyDataUser() {
-	cores.ClearDocument(D.DailyService.TxtPath)
-	for i := 2; i <= D.HouseAmount; i++ {
-		D.DailyElement.HouseName = fmt.Sprintf("A%v", i)
-		D.DailyService.DailyData.HouseName = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.HouseName)
-
-		D.DailyElement.Deposit = fmt.Sprintf("D%v", i)
-		D.DailyService.DailyData.Deposit = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.Deposit)
-
-		D.DailyElement.Withdrawal = fmt.Sprintf("J%v", i)
-		D.DailyService.DailyData.Withdrawal = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.Withdrawal)
-
-		D.DailyElement.DepSubWith = fmt.Sprintf("K%v", i)
-		D.DailyService.DailyData.DepSubWith = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.DepSubWith)
-
-		D.DailyElement.BetTotal = fmt.Sprintf("R%v", i)
-		D.DailyService.DailyData.BetTotal = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.BetTotal)
-
-		D.DailyElement.WinAmount = fmt.Sprintf("W%v", i)
-		D.DailyService.DailyData.WinAmount = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.WinAmount)
-
-		D.DailyElement.ReturnWater = fmt.Sprintf("P%v", i)
-		D.DailyService.DailyData.ReturnWater = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.ReturnWater)
-
-		D.DailyElement.Active = fmt.Sprintf("T%v", i)
-		D.DailyService.DailyData.Active = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.Active)
-
-		D.DailyElement.Commission = fmt.Sprintf("X%v", i)
-		D.DailyService.DailyData.Commission = cores.GetExcelValue(D.F, D.TableName, D.DailyElement.Commission)
-
-		D.DailyService.GetActiveAounmt()
-
-		D.DailyService.GetWinOrLose()
-
-		D.DailyService.GetProfitAndLoss()
-
-		D.DailyService.FormatDailyDataContent()
+// 有效-派彩 = 游戏输赢
+func (s *DailyDataController) GetWinOrLose() {
+	betFloat, err := strconv.ParseFloat(s.DailyData.BetTotal, 64)
+	if err != nil {
+		fmt.Println("有效投注转化Float64类型错误", err)
 	}
+
+	winFloat, err := strconv.ParseFloat(s.DailyData.WinAmount, 64)
+	if err != nil {
+		fmt.Println("派彩金额转化Float64类型错误", err)
+	}
+
+	WinOrLose := betFloat - winFloat
+	s.WinOrLose = strconv.FormatFloat(WinOrLose, 'f', -1, 64)
 }
 
-func (D *DailyDataController) GamesDailyData() {
-	D.DailyService.GameData.G7Rows = cores.GetExcelRows(D.F, "G7")
-	D.DailyService.GameData.YYRows = cores.GetExcelRows(D.F, "YY")
-	D.DailyService.GameData.BYRows = cores.GetExcelRows(D.F, "BY")
-
-	cores.GamesDataSort(D.DailyService.GameData.G7Rows, 5)
-	cores.GamesDataSort(D.DailyService.GameData.YYRows, 5)
-	cores.GamesDataSort(D.DailyService.GameData.BYRows, 5)
-
-	cores.Slicing(&D.DailyService.GameData.G7Rows, 3, 3)
-	cores.Slicing(&D.DailyService.GameData.YYRows, 3, 3)
-	cores.Slicing(&D.DailyService.GameData.BYRows, 3, 3)
-
-	D.DailyService.Content = "------G7每日游戏输赢-------\n"
-	cores.UpDataReport(D.DailyService.Content, D.DailyService.TxtPath)
-	for _, v := range D.DailyService.GameData.G7Rows {
-		D.DailyService.FormatGameContent(v[0], v[6], v[5])
-	}
-	D.DailyService.Content = "------YY每日游戏输赢-------\n"
-	cores.UpDataReport(D.DailyService.Content, D.DailyService.TxtPath)
-	for _, v := range D.DailyService.GameData.YYRows {
-		D.DailyService.FormatGameContent(v[0], v[6], v[5])
+// 子公司、房主总输赢   游戏输赢-总营销
+func (s *DailyDataController) GetProfitAndLoss() {
+	WinOrLoseFloat, err := strconv.ParseFloat(s.WinOrLose, 64)
+	if err != nil {
+		fmt.Println("游戏输赢转化Float64类型错误", err)
 	}
 
-	D.DailyService.Content = "------BY每日游戏输赢-------\n"
-	cores.UpDataReport(D.DailyService.Content, D.DailyService.TxtPath)
-	for _, v := range D.DailyService.GameData.BYRows {
-		D.DailyService.FormatGameContent(v[0], v[6], v[5])
+	ActiveAounmtFloat, err := strconv.ParseFloat(s.ActiveAounmt, 64)
+	if err != nil {
+		fmt.Println("营销总支出转化Float64类型错误", err)
 	}
 
+	ProfitAndLoss := WinOrLoseFloat - ActiveAounmtFloat
+	s.ProfitAndLoss = strconv.FormatFloat(ProfitAndLoss, 'f', -1, 64)
+}
+
+func (s *DailyDataController) FormatDailyDataContent() {
+	Deposit := cores.TransitionData(s.DailyData.Deposit)
+	Withdrawal := cores.TransitionData(s.DailyData.Withdrawal)
+	DepSubWith := cores.TransitionData(s.DailyData.DepSubWith)
+	BetTotal := cores.TransitionData(s.DailyData.BetTotal)
+	WinOrLose := cores.TransitionWinOrLose(s.WinOrLose)
+	ActiveAounmt := cores.TransitionData(s.ActiveAounmt)
+	ProfitAndLoss := cores.IsCompanyWinOrLose(s.ProfitAndLoss)
+	s.Content = fmt.Sprintf("%s:存款%s，取款%s，存取差%s，有效投注%s，游戏%s，优惠返佣返水总和%s，%s \n",
+		s.DailyData.HouseName, Deposit, Withdrawal, DepSubWith, BetTotal, WinOrLose, ActiveAounmt, ProfitAndLoss,
+	)
+
+	cores.UpDataReport(s.Content, s.TxtPath)
+}
+
+func (s *DailyDataController) FormatGameContent(GameName string, BetTotal string, WinOrLose string) {
+	BetTotal = cores.TransitionData(BetTotal)
+	WinOrLose = cores.TransitionWinOrLose(WinOrLose)
+	s.Content = fmt.Sprintf("%s:有效投注%s,%s \n", GameName, BetTotal, WinOrLose)
+
+	cores.UpDataReport(s.Content, s.TxtPath)
 }

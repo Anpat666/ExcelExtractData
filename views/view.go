@@ -1,8 +1,8 @@
 package views
 
 import (
-	"data/controllers"
 	"data/cores"
+	"data/services"
 	"fmt"
 )
 
@@ -13,6 +13,8 @@ type User struct {
 	CompanyAmount int
 	ExcelPath     string
 	TxtPath       string
+	ThisTableName string
+	LastTableName string
 }
 
 func MenuView() {
@@ -34,7 +36,7 @@ func (u *User) dailyData() {
 
 	u.ExcelPath = "document/下级代理帐变报表.xlsx"
 	u.TxtPath = "document/dailyDataReport.txt"
-	daily := controllers.NewDailyDataController(u.HouseAmount, u.ExcelPath, u.TxtPath)
+	daily := services.NewDailyDataService(u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	daily.DailyDataUser()
 	cores.ReplaceDocument("分公司", "房主", u.TxtPath, 4)
@@ -61,19 +63,33 @@ func (u *User) weekData() {
 
 	fmt.Println("在document文件中必须存在《周报数据表.xlsx》，文件名必须正确")
 
-	fmt.Printf("请输入需要制作的公司层级数量：")
-	fmt.Scanln(&u.CompanyAmount)
-	u.CompanyAmount = 2 + u.CompanyAmount*4
-
 	fmt.Printf("请输入需要制作的房间统计数量：")
 	fmt.Scanln(&u.HouseAmount)
 	u.HouseAmount = 30 + u.HouseAmount*4
 
+	u.CompanyAmount = 18
 	u.ExcelPath = "document/周报数据表.xlsx"
 	u.TxtPath = "document/weekDataReport.txt"
-	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
+	u.ThisTableName = "本周游戏数据"
+	u.LastTableName = "上周游戏数据"
+	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath, u.LastTableName, u.ThisTableName)
 
 	week.WeekDataUser()
+	for {
+		fmt.Printf("是否需要制作周游戏数据回报(输入1需要或者输入2不需要)：")
+		fmt.Scanln(&u.GameChoose)
+		if u.GameChoose == 1 || u.GameChoose == 2 {
+			if u.GameChoose == 1 {
+				week.GameWeekData()
+				break
+			} else {
+				break
+			}
+		} else {
+			fmt.Println("选择有误，请重新输入")
+		}
+	}
+
 }
 
 func (u *User) monData() {
@@ -81,19 +97,33 @@ func (u *User) monData() {
 
 	fmt.Println("在document文件中必须存在《月报数据表.xlsx》，文件名必须正确")
 
-	fmt.Printf("请输入需要制作的公司层级数量：")
-	fmt.Scanln(&u.CompanyAmount)
-	u.CompanyAmount = 2 + u.CompanyAmount*4
-
 	fmt.Printf("请输入需要制作的房间统计数量：")
 	fmt.Scanln(&u.HouseAmount)
 	u.HouseAmount = 30 + u.HouseAmount*4
 
+	u.CompanyAmount = 18
 	u.ExcelPath = "document/月报数据表.xlsx"
 	u.TxtPath = "document/monDataReport.txt"
-	week := controllers.NewWeekDataController(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
+	u.ThisTableName = "本月游戏数据"
+	u.LastTableName = "上月游戏数据"
+	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath, u.LastTableName, u.ThisTableName)
 
 	week.WeekDataUser()
+	for {
+		fmt.Printf("是否需要制作月游戏数据回报(输入1需要或者输入2不需要)：")
+		fmt.Scanln(&u.GameChoose)
+		if u.GameChoose == 1 || u.GameChoose == 2 {
+			if u.GameChoose == 1 {
+				week.GameWeekData()
+				break
+			} else {
+				break
+			}
+		} else {
+			fmt.Println("选择有误，请重新输入")
+		}
+	}
+
 	cores.ReplaceDocument("周", "月", u.TxtPath, 0)
 }
 

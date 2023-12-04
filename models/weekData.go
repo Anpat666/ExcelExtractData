@@ -1,8 +1,24 @@
 package models
 
 type GameWeek struct {
-	ThisGame [][]string
-	LastGame [][]string
+	ThisGame   [][]string
+	LastGame   [][]string
+	BetingBest [][]string //本周有效投注  百分比 前3和后3
+	WinOrLose  [][]string //本周实际输赢排序
+	BetingRate [][]string //本周与上周投注额差值排序
+}
+
+type GamesExcel struct {
+	BetTotal      int        //总投注额
+	WinOrLose     float64    //所有游戏总输赢
+	LotteryTotal  int        //彩票总投注额
+	LotteryPro    string     //彩票占比
+	LotteryWinPro string     //彩票占总输赢的占比
+	VideoTotal    int        //视讯总投注额
+	VideoPro      string     //视讯占比
+	VideoWinPro   string     //视讯占总输赢的占比
+	Lottery       [][]string //彩票类有效
+	Video         [][]string //视讯类游戏
 }
 
 var ThisWeekDataMap = map[string]string{

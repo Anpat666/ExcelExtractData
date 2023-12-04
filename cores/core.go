@@ -104,7 +104,7 @@ func IsCompanyWinOrLose(dataStr string) string {
 
 // 游戏输赢冒泡排序
 func GamesDataSort(data [][]string, row int) {
-	for i := 0; i < len(data)-1; i++ {
+	for i := 0; i < len(data); i++ {
 		for k := i + 1; k < len(data); k++ {
 			numI, _ := strconv.ParseFloat(data[i][row], 64)
 			numK, _ := strconv.ParseFloat(data[k][row], 64)

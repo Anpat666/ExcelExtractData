@@ -56,3 +56,15 @@ func DepositsSubWithdrawal(Deposits string, Withdrawal string) string {
 	strRes := fmt.Sprintf("%f", res)
 	return strRes
 }
+
+// 占比计算 返回百分比字符串
+func ProPortion(dataTotal string, data string) string {
+	dataTotalFloat, _ := strconv.ParseFloat(dataTotal, 64)
+	dataFloat, _ := strconv.ParseFloat(data, 64)
+	res := dataFloat / dataTotalFloat
+	res *= 100
+	strRes := strconv.FormatFloat(res, 'f', 2, 64)
+	strRes = fmt.Sprintf("%s%%", strRes)
+	return strRes
+
+}
