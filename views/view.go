@@ -70,9 +70,8 @@ func (u *UserView) weekDataView() {
 	u.CompanyAmount = 18
 	u.ExcelPath = "document/周报数据表.xlsx"
 	u.TxtPath = "document/weekDataReport.txt"
-	u.ThisTableName = "本周游戏数据"
-	u.LastTableName = "上周游戏数据"
-	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath, u.LastTableName, u.ThisTableName)
+
+	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	week.WeekDataUser()
 	for {
@@ -106,7 +105,7 @@ func (u *UserView) monDataView() {
 	u.TxtPath = "document/monDataReport.txt"
 	u.ThisTableName = "本月游戏数据"
 	u.LastTableName = "上月游戏数据"
-	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath, u.LastTableName, u.ThisTableName)
+	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	week.WeekDataUser()
 	for {

@@ -116,7 +116,32 @@ func GamesDataSort(data [][]string, row int) {
 	}
 }
 
-// 操作原始切片
 func Slicing(data *[][]string, first int, last int) {
 	*data = append((*data)[:first], (*data)[len(*data)-last:]...)
+}
+
+func MergeSlice(data1 [][]string, data2 [][]string, data3 [][]string) [][]string {
+	rows := len(data1)
+	cols := len(data1[0])
+	MergeData := make([][]string, rows)
+	for i := range MergeData {
+		MergeData[i] = make([]string, cols)
+	}
+
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if i == 0 || i == 9 || j == 0 {
+				MergeData[i][j] = data1[i][j]
+				continue
+			}
+
+			data1Float, _ := strconv.ParseFloat(data1[i][j], 64)
+			data2Float, _ := strconv.ParseFloat(data2[i][j], 64)
+			data3Float, _ := strconv.ParseFloat(data3[i][j], 64)
+			res := data1Float + data2Float + data3Float
+			MergeData[i][j] = fmt.Sprintf("%v", int(res))
+
+		}
+	}
+	return MergeData
 }

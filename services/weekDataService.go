@@ -16,12 +16,11 @@ type WeekDataService struct {
 	TableName      string
 	HouseAmount    int
 	CompanyAmount  int
-	ThisTableName  string
-	LastTableName  string
-	F              *excelize.File
+
+	F *excelize.File
 }
 
-func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, TxtPath string, LastTableName string, ThisTableName string) *WeekDataService {
+func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, TxtPath string) *WeekDataService {
 	return &WeekDataService{
 		WeekController: &controllers.WeekDataController{
 			WeekGame:             &models.GameWeek{},
@@ -38,9 +37,8 @@ func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, Tx
 		TableName:     "Sheet1",
 		CompanyAmount: CompanyAmount,
 		HouseAmount:   HouseAmount,
-		ThisTableName: ThisTableName,
-		LastTableName: LastTableName,
-		F:             cores.OpenExcel(ExcelPath),
+
+		F: cores.OpenExcel(ExcelPath),
 	}
 }
 
@@ -82,8 +80,17 @@ func (w *WeekDataService) WeekDataUser() {
 }
 
 func (D *WeekDataService) GameWeekData() {
-	D.WeekController.WeekGame.ThisGame = cores.GetExcelCols(D.F, D.ThisTableName)
-	D.WeekController.WeekGame.LastGame = cores.GetExcelCols(D.F, D.LastTableName)
+
+	G7Data := cores.GetExcelCols(D.F, "G7")
+	YYData := cores.GetExcelCols(D.F, "YY")
+	BYData := cores.GetExcelCols(D.F, "BY")
+
+	LastG7Data := cores.GetExcelCols(D.F, "G7上周")
+	LastYYData := cores.GetExcelCols(D.F, "YY上周")
+	LastBYData := cores.GetExcelCols(D.F, "BY上周")
+
+	D.WeekController.WeekGame.ThisGame = cores.MergeSlice(G7Data, YYData, BYData)
+	D.WeekController.WeekGame.LastGame = cores.MergeSlice(LastG7Data, LastYYData, LastBYData)
 
 	cores.MakeNewDataExcel(D.WeekController.WeekGame.ThisGame, D.WeekController.WeekGame.LastGame)
 	newRows, Totalrows := cores.GamesDataExcelSort()

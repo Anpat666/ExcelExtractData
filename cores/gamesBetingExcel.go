@@ -15,7 +15,7 @@ func MakeNewDataExcel(this [][]string, last [][]string) {
 			fmt.Println(err)
 		}
 	}()
-	// 创建一个工作表
+
 	index, err := f.NewSheet("Sheet2")
 	if err != nil {
 		fmt.Println(err)
@@ -54,7 +54,7 @@ func MakeNewDataExcel(this [][]string, last [][]string) {
 		thisFloat, _ := strconv.ParseFloat(thisCell, 64)
 		lastFloat, _ := strconv.ParseFloat(lastCELL, 64)
 		res2 := thisFloat/lastFloat - 1
-		res2 *= 2
+		res2 *= 100
 		res2Str := strconv.FormatFloat(res2, 'f', 2, 64)
 		new2Str := fmt.Sprintf("%s%%", res2Str)
 		cellformula = fmt.Sprintf("E%v", i)
@@ -102,6 +102,7 @@ func MakeNewDataExcel(this [][]string, last [][]string) {
 	}
 
 	betTatalLink = betTotal/lastBetTotal - 1
+	betTatalLink *= 100
 	winDivbet = winOrlose / betTotal
 
 	betTatalLinkStr := strconv.FormatFloat(betTatalLink, 'f', 2, 64)
