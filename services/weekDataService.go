@@ -11,15 +11,16 @@ import (
 )
 
 type WeekDataService struct {
-	WeekController *controllers.WeekDataController
-	TableName      string
-	HouseAmount    int
-	CompanyAmount  int
+	WeekController   *controllers.WeekDataController
+	TableName        string
+	HouseAmount      int
+	CompanyAmount    int
+	HouseDataStarLin int
 
 	F *excelize.File
 }
 
-func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, TxtPath string) *WeekDataService {
+func NewWeekDataService(CompanyAmount int, HouseAmount int, HouseDataStarLin int, ExcelPath string, TxtPath string) *WeekDataService {
 	return &WeekDataService{
 		WeekController: &controllers.WeekDataController{
 			WeekGame:             &models.GameWeek{},
@@ -33,9 +34,10 @@ func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, Tx
 			TxtPath:              TxtPath,
 		},
 
-		TableName:     "Sheet1",
-		CompanyAmount: CompanyAmount,
-		HouseAmount:   HouseAmount,
+		TableName:        "Sheet1",
+		CompanyAmount:    CompanyAmount,
+		HouseAmount:      HouseAmount,
+		HouseDataStarLin: HouseDataStarLin,
 
 		F: cores.OpenExcel(ExcelPath),
 	}
@@ -58,7 +60,7 @@ func (w *WeekDataService) WeekDataUser() {
 		i += 3
 	}
 
-	for j := 28; j <= w.HouseAmount; j++ {
+	for j := w.HouseDataStarLin; j <= w.HouseAmount; j++ {
 		for k, v := range w.WeekController.ThisHouseData {
 			element := fmt.Sprintf("%s%v", v, j)
 			value := cores.GetExcelValue(w.F, w.TableName, element)
@@ -67,13 +69,8 @@ func (w *WeekDataService) WeekDataUser() {
 			element = fmt.Sprintf("%s%v", v, j-1)
 			value = cores.GetExcelValue(w.F, w.TableName, element)
 			(*w.WeekController.LastHouseDataValue)[k] = value
-
 		}
 		w.WeekController.WeekHouseFormatContent()
-		if j == 40 || j == 55 {
-			j += 6
-			continue
-		}
 		j += 3
 	}
 }
