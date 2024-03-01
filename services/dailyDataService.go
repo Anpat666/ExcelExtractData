@@ -74,17 +74,24 @@ func (D *DailyDataService) DailyDataUser() {
 }
 
 func (D *DailyDataService) GamesDailyData() {
+	by01 := cores.GetExcelRows(D.F, "BY01")
+	by02 := cores.GetExcelRows(D.F, "BY02")
+	fillerRows := cores.GetExcelRows(D.F, "TEST")
+
 	D.DailyController.GameData.G7Rows = cores.GetExcelRows(D.F, "G7")
 	D.DailyController.GameData.YYRows = cores.GetExcelRows(D.F, "YY")
-	D.DailyController.GameData.BYRows = cores.GetExcelRows(D.F, "BY")
+	D.DailyController.GameData.BYRows = cores.MergeSlice(by01, by02, fillerRows)
+	D.DailyController.GameData.ZSRows = cores.GetExcelRows(D.F, "ZS")
 
 	cores.GamesDataSort(D.DailyController.GameData.G7Rows, 5)
 	cores.GamesDataSort(D.DailyController.GameData.YYRows, 5)
 	cores.GamesDataSort(D.DailyController.GameData.BYRows, 5)
+	cores.GamesDataSort(D.DailyController.GameData.ZSRows, 5)
 
 	cores.Slicing(&D.DailyController.GameData.G7Rows, 3, 3)
 	cores.Slicing(&D.DailyController.GameData.YYRows, 3, 3)
 	cores.Slicing(&D.DailyController.GameData.BYRows, 3, 3)
+	cores.Slicing(&D.DailyController.GameData.ZSRows, 3, 3)
 
 	D.DailyController.Content = "------G7每日游戏输赢-------\n"
 	cores.UpDataReport(D.DailyController.Content, D.DailyController.TxtPath)
@@ -100,6 +107,12 @@ func (D *DailyDataService) GamesDailyData() {
 	D.DailyController.Content = "------BY每日游戏输赢-------\n"
 	cores.UpDataReport(D.DailyController.Content, D.DailyController.TxtPath)
 	for _, v := range D.DailyController.GameData.BYRows {
+		D.DailyController.FormatGameContent(v[0], v[6], v[5])
+	}
+
+	D.DailyController.Content = "------ZS每日游戏输赢-------\n"
+	cores.UpDataReport(D.DailyController.Content, D.DailyController.TxtPath)
+	for _, v := range D.DailyController.GameData.ZSRows {
 		D.DailyController.FormatGameContent(v[0], v[6], v[5])
 	}
 

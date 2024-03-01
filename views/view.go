@@ -11,6 +11,7 @@ type UserView struct {
 	HouseAmount   int
 	GameChoose    int
 	CompanyAmount int
+	HouseDataLin  int
 	ExcelPath     string
 	TxtPath       string
 	ThisTableName string
@@ -39,7 +40,7 @@ func (u *UserView) dailyDataView() {
 	daily := services.NewDailyDataService(u.HouseAmount, u.ExcelPath, u.TxtPath)
 
 	daily.DailyDataUser()
-	cores.ReplaceDocument("分公司", "房主", u.TxtPath, 4)
+	// cores.ReplaceDocument("分公司", "房主", u.TxtPath, 5)
 
 	for {
 		fmt.Printf("是否需要制作游戏输赢统计(输入1需要或者输入2不需要)：")
@@ -63,15 +64,24 @@ func (u *UserView) weekDataView() {
 
 	fmt.Println("在document文件中必须存在《周报数据表.xlsx》，文件名必须正确")
 
+	fmt.Printf("请输入需要制作的公司数量：")
+	fmt.Scanln(&u.CompanyAmount)
+	u.CompanyAmount = 2 + u.CompanyAmount*4
+
+	fmt.Printf("请输入开始制作房间数据开始的行数(第一个房间本周数据的行数)：")
+	fmt.Scanln(&u.HouseDataLin)
+
 	fmt.Printf("请输入需要制作的房间统计数量：")
 	fmt.Scanln(&u.HouseAmount)
-	u.HouseAmount = 30 + u.HouseAmount*4
+	u.HouseAmount = u.HouseDataLin + u.HouseAmount*4 - 4
 
-	u.CompanyAmount = 18
 	u.ExcelPath = "document/周报数据表.xlsx"
 	u.TxtPath = "document/weekDataReport.txt"
 
-	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
+	u.ThisTableName = "本周游戏数据"
+	u.LastTableName = "上周游戏数据"
+
+	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.HouseDataLin, u.ExcelPath, u.TxtPath, u.ThisTableName, u.LastTableName)
 
 	week.WeekDataUser()
 	for {
@@ -96,16 +106,22 @@ func (u *UserView) monDataView() {
 
 	fmt.Println("在document文件中必须存在《月报数据表.xlsx》，文件名必须正确")
 
+	fmt.Printf("请输入需要制作的公司数量：")
+	fmt.Scanln(&u.CompanyAmount)
+	u.CompanyAmount = 2 + u.CompanyAmount*4
+
+	fmt.Printf("请输入开始制作房间数据开始的行数：")
+	fmt.Scanln(&u.HouseDataLin)
+
 	fmt.Printf("请输入需要制作的房间统计数量：")
 	fmt.Scanln(&u.HouseAmount)
-	u.HouseAmount = 30 + u.HouseAmount*4
+	u.HouseAmount = u.HouseDataLin + u.HouseAmount*4 - 4
 
-	u.CompanyAmount = 18
 	u.ExcelPath = "document/月报数据表.xlsx"
 	u.TxtPath = "document/monDataReport.txt"
 	u.ThisTableName = "本月游戏数据"
 	u.LastTableName = "上月游戏数据"
-	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.ExcelPath, u.TxtPath)
+	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.HouseDataLin, u.ExcelPath, u.TxtPath, u.ThisTableName, u.LastTableName)
 
 	week.WeekDataUser()
 	for {

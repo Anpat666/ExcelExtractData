@@ -4,6 +4,7 @@ import (
 	"data/cores"
 	"data/models"
 	"fmt"
+	"strings"
 )
 
 type WeekDataController struct {
@@ -49,7 +50,7 @@ func (w *WeekDataController) WeekDataFormatContent() {
 	w.Link = cores.ComparisonTool(w.ThisData, w.LastData)
 	w.ThisData = cores.TransitionData(w.ThisData)
 	w.LastData = cores.TransitionData(w.LastData)
-	w.Content = fmt.Sprintf("4、人均存款金额：上周%s，本周%s，%s。\n", w.ThisData, w.LastData, w.Link)
+	w.Content = fmt.Sprintf("4、人均存款金额：上周%s，本周%s，%s。\n", w.LastData, w.ThisData, w.Link)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
 	w.ThisData = cores.PerCapitaStatistics((*w.ThisWeekDataMapValue)["BetTotal"], (*w.ThisWeekDataMapValue)["PlayerBeting"])
@@ -212,6 +213,9 @@ func (w *WeekDataController) GamesDataFormatTxt() {
 	)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
+	w.WeekGame.BetingRate[5][1] = strings.Replace(w.WeekGame.BetingRate[5][1], "-", "", 1)
+	w.WeekGame.BetingRate[4][1] = strings.Replace(w.WeekGame.BetingRate[4][1], "-", "", 1)
+	w.WeekGame.BetingRate[3][1] = strings.Replace(w.WeekGame.BetingRate[3][1], "-", "", 1)
 	w.Content = fmt.Sprintf("（1）投注量负成长最多的是「%s」下降%s，其次是「%s」下降%s，第三名是「%s」下降%s\n",
 		w.WeekGame.BetingRate[5][0], w.WeekGame.BetingRate[5][1],
 		w.WeekGame.BetingRate[4][0], w.WeekGame.BetingRate[4][1],

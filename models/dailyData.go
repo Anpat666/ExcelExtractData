@@ -29,4 +29,5 @@ type GameData struct {
 	G7Rows [][]string
 	YYRows [][]string
 	BYRows [][]string
+	ZSRows [][]string
 }

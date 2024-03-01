@@ -3,6 +3,7 @@ package cores
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -66,17 +67,27 @@ func TransitionWinOrLose(data string) string {
 			dataFloat /= 10000
 			sData := strconv.FormatFloat(dataFloat, 'f', 2, 64)
 			strData := fmt.Sprintf("亏损%s万", sData)
+			strData = strings.Replace(strData, "-", "", 1)
 			return strData
 		}
 
 		strData := fmt.Sprintf("亏损%v元", int(dataFloat))
+		strData = strings.Replace(strData, "-", "", 1)
 		return strData
 	}
 }
 
 // 公司盈亏判定格式化输出
-func IsCompanyWinOrLose(dataStr string) string {
+func IsCompanyWinOrLose(dataStr string, HouseName string) string {
 	data, err := strconv.ParseFloat(dataStr, 64)
+	name := "房主"
+	if strings.Contains(HouseName, "公司") {
+		name = "分公司"
+	}
+	if strings.Contains(HouseName, "招商") {
+		name = "招商部"
+	}
+
 	if err != nil {
 		fmt.Println("格式转换出错，core.IsCompanyWinOrLose", err)
 	}
@@ -84,20 +95,22 @@ func IsCompanyWinOrLose(dataStr string) string {
 		if data >= 100 {
 			data /= 10000
 			sdata := strconv.FormatFloat(data, 'f', 2, 64)
-			strdata := fmt.Sprintf("总盈利%s万（分公司赢钱）", sdata)
+			strdata := fmt.Sprintf("总盈利%s万（%s赢钱）", sdata, name)
 			return strdata
 		}
 
-		strdata := fmt.Sprintf("总盈利%v元（分公司赢钱）", int(data))
+		strdata := fmt.Sprintf("总盈利%v元（%s赢钱）", int(data), name)
 		return strdata
 	} else {
 		if data > -100 {
-			strdata := fmt.Sprintf("总亏损%v元（分公司亏钱）", int(data))
+			strdata := fmt.Sprintf("总亏损%v元（%s亏钱）", int(data), name)
+			strdata = strings.Replace(strdata, "-", "", 1)
 			return strdata
 		}
 		data /= 10000
 		sdata := strconv.FormatFloat(data, 'f', 2, 64)
-		strdata := fmt.Sprintf("总亏损%s万（分公司亏钱）", sdata)
+		strdata := fmt.Sprintf("总亏损%s万（%s亏钱）", sdata, name)
+		strdata = strings.Replace(strdata, "-", "", 1)
 		return strdata
 	}
 }

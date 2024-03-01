@@ -11,15 +11,18 @@ import (
 )
 
 type WeekDataService struct {
-	WeekController *controllers.WeekDataController
-	TableName      string
-	HouseAmount    int
-	CompanyAmount  int
+	WeekController    *controllers.WeekDataController
+	TableName         string
+	HouseAmount       int
+	CompanyAmount     int
+	HouseDataStarLin  int
+	ThisDataTableName string
+	LastDataTableName string
 
 	F *excelize.File
 }
 
-func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, TxtPath string) *WeekDataService {
+func NewWeekDataService(CompanyAmount int, HouseAmount int, HouseDataStarLin int, ExcelPath string, TxtPath string, ThisDataTableName string, LastDataTableName string) *WeekDataService {
 	return &WeekDataService{
 		WeekController: &controllers.WeekDataController{
 			WeekGame:             &models.GameWeek{},
@@ -33,9 +36,12 @@ func NewWeekDataService(CompanyAmount int, HouseAmount int, ExcelPath string, Tx
 			TxtPath:              TxtPath,
 		},
 
-		TableName:     "Sheet1",
-		CompanyAmount: CompanyAmount,
-		HouseAmount:   HouseAmount,
+		TableName:         "Sheet1",
+		CompanyAmount:     CompanyAmount,
+		HouseAmount:       HouseAmount,
+		HouseDataStarLin:  HouseDataStarLin,
+		ThisDataTableName: ThisDataTableName,
+		LastDataTableName: LastDataTableName,
 
 		F: cores.OpenExcel(ExcelPath),
 	}
@@ -58,7 +64,7 @@ func (w *WeekDataService) WeekDataUser() {
 		i += 3
 	}
 
-	for j := 28; j <= w.HouseAmount; j++ {
+	for j := w.HouseDataStarLin; j <= w.HouseAmount; j++ {
 		for k, v := range w.WeekController.ThisHouseData {
 			element := fmt.Sprintf("%s%v", v, j)
 			value := cores.GetExcelValue(w.F, w.TableName, element)
@@ -67,29 +73,19 @@ func (w *WeekDataService) WeekDataUser() {
 			element = fmt.Sprintf("%s%v", v, j-1)
 			value = cores.GetExcelValue(w.F, w.TableName, element)
 			(*w.WeekController.LastHouseDataValue)[k] = value
-
 		}
 		w.WeekController.WeekHouseFormatContent()
-		if j == 40 || j == 55 {
-			j += 6
-			continue
-		}
 		j += 3
 	}
 }
 
 func (D *WeekDataService) GameWeekData() {
 
-	G7Data := cores.GetExcelCols(D.F, "G7")
-	YYData := cores.GetExcelCols(D.F, "YY")
-	BYData := cores.GetExcelCols(D.F, "BY")
+	D.WeekController.WeekGame.ThisGame = cores.GetExcelCols(D.F, D.ThisDataTableName)
+	D.WeekController.WeekGame.LastGame = cores.GetExcelCols(D.F, D.LastDataTableName)
 
-	LastG7Data := cores.GetExcelCols(D.F, "G7上周")
-	LastYYData := cores.GetExcelCols(D.F, "YY上周")
-	LastBYData := cores.GetExcelCols(D.F, "BY上周")
-
-	D.WeekController.WeekGame.ThisGame = cores.MergeSlice(G7Data, YYData, BYData)
-	D.WeekController.WeekGame.LastGame = cores.MergeSlice(LastG7Data, LastYYData, LastBYData)
+	D.WeekController.WeekGame.ThisGame = cores.GameCategory(D.WeekController.WeekGame.ThisGame)
+	D.WeekController.WeekGame.LastGame = cores.GameCategory(D.WeekController.WeekGame.LastGame)
 
 	cores.MakeNewDataExcel(D.WeekController.WeekGame.ThisGame, D.WeekController.WeekGame.LastGame)
 	newRows, Totalrows := cores.GamesDataExcelSort()

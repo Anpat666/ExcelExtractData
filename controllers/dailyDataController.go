@@ -78,7 +78,7 @@ func (s *DailyDataController) FormatDailyDataContent() {
 	BetTotal := cores.TransitionData(s.DailyData.BetTotal)
 	WinOrLose := cores.TransitionWinOrLose(s.WinOrLose)
 	ActiveAounmt := cores.TransitionData(s.ActiveAounmt)
-	ProfitAndLoss := cores.IsCompanyWinOrLose(s.ProfitAndLoss)
+	ProfitAndLoss := cores.IsCompanyWinOrLose(s.ProfitAndLoss, s.DailyData.HouseName)
 	s.Content = fmt.Sprintf("%s:存款%s，取款%s，存取差%s，有效投注%s，游戏%s，优惠返佣返水总和%s，%s \n",
 		s.DailyData.HouseName, Deposit, Withdrawal, DepSubWith, BetTotal, WinOrLose, ActiveAounmt, ProfitAndLoss,
 	)
