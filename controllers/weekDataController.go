@@ -16,6 +16,11 @@ type WeekDataController struct {
 	ThisHouseData        map[string]string
 	ThisHouseDataValue   *map[string]string
 	LastHouseDataValue   *map[string]string
+	TotalGameClass       *models.GameClass
+	G7GameClass          *models.GameClass
+	YYGameClass          *models.GameClass
+	BYGameClass          *models.GameClass
+	ZSGameClass          *models.GameClass
 	Content              string
 	TxtPath              string
 	Link                 string
@@ -47,7 +52,7 @@ func (w *WeekDataController) WeekDataFormatContent() {
 
 	w.ThisData = cores.PerCapitaStatistics((*w.ThisWeekDataMapValue)["Deposit"], (*w.ThisWeekDataMapValue)["PlayerDeposit"])
 	w.LastData = cores.PerCapitaStatistics((*w.LastWeekDataMapValue)["Deposit"], (*w.LastWeekDataMapValue)["PlayerDeposit"])
-	w.Link = cores.ComparisonTool(w.ThisData, w.LastData)
+	w.Link = cores.ComparisonTool(w.LastData, w.ThisData)
 	w.ThisData = cores.TransitionData(w.ThisData)
 	w.LastData = cores.TransitionData(w.LastData)
 	w.Content = fmt.Sprintf("4、人均存款金额：上周%s，本周%s，%s。\n", w.LastData, w.ThisData, w.Link)
@@ -167,9 +172,9 @@ func (w *WeekDataController) WeekHouseFormatContent() {
 }
 
 func (w *WeekDataController) GamesDataFormatTxt() {
-	w.Content = fmt.Sprintf("--------周报游戏数据-------- \n")
+	w.Content = "--------周报游戏数据-------- \n"
 	cores.UpDataReport(w.Content, w.TxtPath)
-	w.Content = fmt.Sprintf("投注量 \n")
+	w.Content = "投注量 \n"
 	cores.UpDataReport(w.Content, w.TxtPath)
 
 	w.Content = fmt.Sprintf("（1）玩的最多的游戏是「%s」%s，其次是「%s」%s，第三名是「%s」%s	\n",
@@ -179,14 +184,14 @@ func (w *WeekDataController) GamesDataFormatTxt() {
 	)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（1）玩的最少的游戏是「%s」%s，其次是「%s」%s，第三名是「%s」%s	\n",
+	w.Content = fmt.Sprintf("（2）玩的最少的游戏是「%s」%s，其次是「%s」%s，第三名是「%s」%s	\n",
 		w.WeekGame.BetingBest[5][0], w.WeekGame.BetingBest[5][1],
 		w.WeekGame.BetingBest[4][0], w.WeekGame.BetingBest[4][1],
 		w.WeekGame.BetingBest[3][0], w.WeekGame.BetingBest[3][1],
 	)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("盈利 \n")
+	w.Content = "盈利 \n"
 	cores.UpDataReport(w.Content, w.TxtPath)
 
 	w.Content = fmt.Sprintf("（1）盈利最多的是「%s」，其次是「%s」，第三名是「%s」	\n",
@@ -203,7 +208,7 @@ func (w *WeekDataController) GamesDataFormatTxt() {
 	)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("投注量成长 \n")
+	w.Content = "投注量成长 \n"
 	cores.UpDataReport(w.Content, w.TxtPath)
 
 	w.Content = fmt.Sprintf("（1）投注量成长最多的是「%s」增长%s，其次是「%s」增长%s，第三名是「%s」增长%s\n",
@@ -216,37 +221,151 @@ func (w *WeekDataController) GamesDataFormatTxt() {
 	w.WeekGame.BetingRate[5][1] = strings.Replace(w.WeekGame.BetingRate[5][1], "-", "", 1)
 	w.WeekGame.BetingRate[4][1] = strings.Replace(w.WeekGame.BetingRate[4][1], "-", "", 1)
 	w.WeekGame.BetingRate[3][1] = strings.Replace(w.WeekGame.BetingRate[3][1], "-", "", 1)
-	w.Content = fmt.Sprintf("（1）投注量负成长最多的是「%s」下降%s，其次是「%s」下降%s，第三名是「%s」下降%s\n",
+	w.Content = fmt.Sprintf("（2）投注量负成长最多的是「%s」下降%s，其次是「%s」下降%s，第三名是「%s」下降%s\n",
 		w.WeekGame.BetingRate[5][0], w.WeekGame.BetingRate[5][1],
 		w.WeekGame.BetingRate[4][0], w.WeekGame.BetingRate[4][1],
 		w.WeekGame.BetingRate[3][0], w.WeekGame.BetingRate[3][1],
 	)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("各游戏种类占比 \n")
+	w.Content = "各游戏种类占比 \n"
 	cores.UpDataReport(w.Content, w.TxtPath)
 
 	w.Content = fmt.Sprintf("（1）彩票游戏投注量占比%s，输赢占比%s \n", w.GamesExcel.LotteryPro, w.GamesExcel.LotteryWinPro)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（1）真人游戏投注量占比%s，输赢占比%s \n", w.GamesExcel.VideoPro, w.GamesExcel.VideoWinPro)
+	w.Content = fmt.Sprintf("（2）真人游戏投注量占比%s，输赢占比%s \n", w.GamesExcel.VideoPro, w.GamesExcel.VideoWinPro)
 	cores.UpDataReport(w.Content, w.TxtPath)
 
 	w.Content = fmt.Sprintf("（3）「 %s 」占比彩票游戏投注量中的%s \n", w.GamesExcel.Lottery[0][0], w.GamesExcel.Lottery[0][1])
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（3）「 %s 」占比彩票游戏投注量中的%s \n", w.GamesExcel.Lottery[1][0], w.GamesExcel.Lottery[1][1])
+	w.Content = fmt.Sprintf("（4）「 %s 」占比彩票游戏投注量中的%s \n", w.GamesExcel.Lottery[1][0], w.GamesExcel.Lottery[1][1])
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（3）「 %s 」占比彩票游戏投注量中的%s \n", w.GamesExcel.Lottery[2][0], w.GamesExcel.Lottery[2][1])
+	w.Content = fmt.Sprintf("（5）「 %s 」占比彩票游戏投注量中的%s \n", w.GamesExcel.Lottery[2][0], w.GamesExcel.Lottery[2][1])
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（3）「 %s 」占比真人游戏投注量中的%s \n", w.GamesExcel.Video[0][0], w.GamesExcel.Video[0][1])
+	w.Content = fmt.Sprintf("（6）「 %s 」占比真人游戏投注量中的%s \n", w.GamesExcel.Video[0][0], w.GamesExcel.Video[0][1])
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（3）「 %s 」占比真人游戏投注量中的%s \n", w.GamesExcel.Video[1][0], w.GamesExcel.Video[1][1])
+	w.Content = fmt.Sprintf("（7）「 %s 」占比真人游戏投注量中的%s \n", w.GamesExcel.Video[1][0], w.GamesExcel.Video[1][1])
 	cores.UpDataReport(w.Content, w.TxtPath)
 
-	w.Content = fmt.Sprintf("（3）「 %s 」占比真人游戏投注量中的%s \n", w.GamesExcel.Video[2][0], w.GamesExcel.Video[2][1])
+	w.Content = fmt.Sprintf("（8）「 %s 」占比真人游戏投注量中的%s \n", w.GamesExcel.Video[2][0], w.GamesExcel.Video[2][1])
 	cores.UpDataReport(w.Content, w.TxtPath)
+}
+
+func (w *WeekDataController) GameClassDataFormatTxt() {
+	w.Content = "--------游戏种类数据汇报-------- \n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "--------总公司-------- \n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "游戏类型  投注笔数   有效投注额   游戏输赢   杀率   投注占比\n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.TotalGameClass.Total, "合计   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.TotalGameClass.TenGame, "十码赛车")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.TotalGameClass.Video, "真人   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.TotalGameClass.Other, "其他彩票")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.TotalGameClass.FiveGame, "五码时时彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.TotalGameClass.SixMark, "六合彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "--------G7-------- \n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "游戏类型  投注笔数   有效投注额   游戏输赢   杀率   投注占比\n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.G7GameClass.Total, "合计   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.G7GameClass.TenGame, "十码赛车")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.G7GameClass.Video, "真人   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.G7GameClass.Other, "其他彩票")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.G7GameClass.FiveGame, "五码时时彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.G7GameClass.SixMark, "六合彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "--------YY-------- \n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "游戏类型  投注笔数   有效投注额   游戏输赢   杀率   投注占比\n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.YYGameClass.Total, "合计   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.YYGameClass.TenGame, "十码赛车")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.YYGameClass.Video, "真人   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.YYGameClass.Other, "其他彩票")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.YYGameClass.FiveGame, "五码时时彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.YYGameClass.SixMark, "六合彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "--------BY-------- \n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = "游戏类型  投注笔数   有效投注额   游戏输赢   杀率   投注占比\n"
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.BYGameClass.Total, "合计   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.BYGameClass.TenGame, "十码赛车")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.BYGameClass.Video, "真人   ")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.BYGameClass.Other, "其他彩票")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.BYGameClass.FiveGame, "五码时时彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+
+	w.Content = GenerateReportLine(w.BYGameClass.SixMark, "六合彩")
+	cores.UpDataReport(w.Content, w.TxtPath)
+}
+
+func GenerateReportLine(gameClass models.GameClassBasic, gameName string) string {
+	Link := cores.FloatTransformStr(gameClass.WinRate)
+	BettingPro := cores.FloatTransformStr(gameClass.BettingPro)
+	return fmt.Sprintf("%s   %.0f、   %.0f、   %.0f、  %s   %s \n",
+		gameName,
+		gameClass.OrderAmount,
+		gameClass.BetTotal,
+		gameClass.Profit,
+		Link,
+		BettingPro,
+	)
 }

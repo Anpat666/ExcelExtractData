@@ -5,6 +5,7 @@ import (
 	"data/cores"
 	"data/models"
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/xuri/excelize/v2"
@@ -33,6 +34,11 @@ func NewWeekDataService(CompanyAmount int, HouseAmount int, HouseDataStarLin int
 			ThisHouseData:        models.ThisHouseData,
 			ThisHouseDataValue:   &models.ThisHouseDataValue,
 			LastHouseDataValue:   &models.LastHouseDataValue,
+			TotalGameClass:       &models.GameClass{},
+			G7GameClass:          &models.GameClass{},
+			YYGameClass:          &models.GameClass{},
+			BYGameClass:          &models.GameClass{},
+			ZSGameClass:          &models.GameClass{},
 			TxtPath:              TxtPath,
 		},
 
@@ -47,7 +53,7 @@ func NewWeekDataService(CompanyAmount int, HouseAmount int, HouseDataStarLin int
 	}
 }
 
-func (w *WeekDataService) WeekDataUser() {
+func (w *WeekDataService) WeekDataService() {
 
 	cores.ClearDocument(w.WeekController.TxtPath)
 	for i := 6; i <= w.CompanyAmount; i++ {
@@ -79,7 +85,7 @@ func (w *WeekDataService) WeekDataUser() {
 	}
 }
 
-func (D *WeekDataService) GameWeekData() {
+func (D *WeekDataService) GameWeekDataService() {
 
 	D.WeekController.WeekGame.ThisGame = cores.GetExcelCols(D.F, D.ThisDataTableName)
 	D.WeekController.WeekGame.LastGame = cores.GetExcelCols(D.F, D.LastDataTableName)
@@ -205,4 +211,96 @@ func (D *WeekDataService) GameWeekData() {
 	}
 
 	D.WeekController.GamesDataFormatTxt()
+}
+
+func (D *WeekDataService) GameClassService() {
+	D.F = cores.OpenExcel("document/周报数据表.xlsx")
+	Total := cores.GetExcelRows(D.F, "本周游戏数据")
+	G7 := cores.GetExcelRows(D.F, "G7")
+	YY := cores.GetExcelRows(D.F, "YY")
+	by01 := cores.GetExcelRows(D.F, "BY01")
+	by02 := cores.GetExcelRows(D.F, "BY02")
+	fillerRows := cores.GetExcelRows(D.F, "TEST")
+	BY := cores.MergeSlice(by01, by02, fillerRows)
+
+	Total = cores.GameCategoryRows(Total)
+	G7 = cores.GameCategoryRows(G7)
+	YY = cores.GameCategoryRows(YY)
+	BY = cores.GameCategoryRows(BY)
+
+	D.WeekController.TotalGameClass.Total.BetTotal = cores.SumColumnRowValues(Total, 6)
+	D.WeekController.TotalGameClass.Total.OrderAmount = cores.SumColumnRowValues(Total, 1)
+	D.WeekController.TotalGameClass.Total.Profit = cores.SumColumnRowValues(Total, 5)
+	D.WeekController.TotalGameClass.Total.WinRate = D.WeekController.TotalGameClass.Total.Profit / D.WeekController.TotalGameClass.Total.BetTotal
+
+	ReflectGameClassValue(Total, &D.WeekController.TotalGameClass.TenGame, "1")
+	ReflectGameClassValue(Total, &D.WeekController.TotalGameClass.Video, "2")
+	ReflectGameClassValue(Total, &D.WeekController.TotalGameClass.Other, "3")
+	ReflectGameClassValue(Total, &D.WeekController.TotalGameClass.FiveGame, "4")
+	ReflectGameClassValue(Total, &D.WeekController.TotalGameClass.SixMark, "5")
+
+	ReflectGameTotalValue(G7, &D.WeekController.G7GameClass.Total, D.WeekController.TotalGameClass.Total.BetTotal)
+	ReflectGameClassValue(G7, &D.WeekController.G7GameClass.TenGame, "1")
+	ReflectGameClassValue(G7, &D.WeekController.G7GameClass.Video, "2")
+	ReflectGameClassValue(G7, &D.WeekController.G7GameClass.Other, "3")
+	ReflectGameClassValue(G7, &D.WeekController.G7GameClass.FiveGame, "4")
+	ReflectGameClassValue(G7, &D.WeekController.G7GameClass.SixMark, "5")
+
+	ReflectGameTotalValue(YY, &D.WeekController.YYGameClass.Total, D.WeekController.TotalGameClass.Total.BetTotal)
+	ReflectGameClassValue(YY, &D.WeekController.YYGameClass.TenGame, "1")
+	ReflectGameClassValue(YY, &D.WeekController.YYGameClass.Video, "2")
+	ReflectGameClassValue(YY, &D.WeekController.YYGameClass.Other, "3")
+	ReflectGameClassValue(YY, &D.WeekController.YYGameClass.FiveGame, "4")
+	ReflectGameClassValue(YY, &D.WeekController.YYGameClass.SixMark, "5")
+
+	ReflectGameTotalValue(BY, &D.WeekController.BYGameClass.Total, D.WeekController.TotalGameClass.Total.BetTotal)
+	ReflectGameClassValue(BY, &D.WeekController.BYGameClass.TenGame, "1")
+	ReflectGameClassValue(BY, &D.WeekController.BYGameClass.Video, "2")
+	ReflectGameClassValue(BY, &D.WeekController.BYGameClass.Other, "3")
+	ReflectGameClassValue(BY, &D.WeekController.BYGameClass.FiveGame, "4")
+	ReflectGameClassValue(BY, &D.WeekController.BYGameClass.SixMark, "5")
+
+	D.WeekController.GameClassDataFormatTxt()
+
+}
+
+func ReflectGameClassValue(data [][]string, GameClass *models.GameClassBasic, num string) {
+	reflectValue := reflect.ValueOf(GameClass).Elem()
+	Bet := cores.SumColumnRowValues(data, 6)
+	for i := 0; i < reflectValue.NumField(); i++ {
+		fieldName := reflectValue.Type().Field(i).Name
+
+		switch fieldName {
+		case "OrderAmount":
+			GameClass.OrderAmount = cores.SumColumnRowCategory(data, 1, num)
+		case "BetTotal":
+			GameClass.BetTotal = cores.SumColumnRowCategory(data, 6, num)
+		case "Profit":
+			GameClass.Profit = cores.SumColumnRowCategory(data, 5, num)
+		case "WinRate":
+			GameClass.WinRate = GameClass.Profit / GameClass.BetTotal
+		case "BettingPro":
+			GameClass.BettingPro = GameClass.BetTotal / Bet
+		}
+	}
+}
+
+func ReflectGameTotalValue(data [][]string, GameClass *models.GameClassBasic, BetAmount float64) {
+	reflectValue := reflect.ValueOf(GameClass).Elem()
+	for i := 0; i < reflectValue.NumField(); i++ {
+		fieldName := reflectValue.Type().Field(i).Name
+
+		switch fieldName {
+		case "OrderAmount":
+			GameClass.OrderAmount = cores.SumColumnRowValues(data, 1)
+		case "BetTotal":
+			GameClass.BetTotal = cores.SumColumnRowValues(data, 6)
+		case "Profit":
+			GameClass.Profit = cores.SumColumnRowValues(data, 5)
+		case "WinRate":
+			GameClass.WinRate = GameClass.Profit / GameClass.BetTotal
+		case "BettingPro":
+			GameClass.BettingPro = GameClass.BetTotal / BetAmount
+		}
+	}
 }

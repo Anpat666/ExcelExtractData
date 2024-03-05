@@ -83,13 +83,14 @@ func (u *UserView) weekDataView() {
 
 	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.HouseDataLin, u.ExcelPath, u.TxtPath, u.ThisTableName, u.LastTableName)
 
-	week.WeekDataUser()
+	week.WeekDataService()
 	for {
 		fmt.Printf("是否需要制作周游戏数据回报(输入1需要或者输入2不需要)：")
 		fmt.Scanln(&u.GameChoose)
 		if u.GameChoose == 1 || u.GameChoose == 2 {
 			if u.GameChoose == 1 {
-				week.GameWeekData()
+				week.GameWeekDataService()
+				week.GameClassService()
 				break
 			} else {
 				break
@@ -123,13 +124,13 @@ func (u *UserView) monDataView() {
 	u.LastTableName = "上月游戏数据"
 	week := services.NewWeekDataService(u.CompanyAmount, u.HouseAmount, u.HouseDataLin, u.ExcelPath, u.TxtPath, u.ThisTableName, u.LastTableName)
 
-	week.WeekDataUser()
+	week.WeekDataService()
 	for {
 		fmt.Printf("是否需要制作月游戏数据回报(输入1需要或者输入2不需要)：")
 		fmt.Scanln(&u.GameChoose)
 		if u.GameChoose == 1 || u.GameChoose == 2 {
 			if u.GameChoose == 1 {
-				week.GameWeekData()
+				week.GameWeekDataService()
 				break
 			} else {
 				break

@@ -21,6 +21,23 @@ type GamesExcel struct {
 	Video         [][]string //视讯类游戏
 }
 
+type GameClass struct {
+	Total    GameClassBasic
+	TenGame  GameClassBasic //1
+	Video    GameClassBasic //2
+	Other    GameClassBasic //3
+	FiveGame GameClassBasic //4
+	SixMark  GameClassBasic //5
+}
+
+type GameClassBasic struct {
+	OrderAmount float64
+	BetTotal    float64
+	Profit      float64
+	WinRate     float64
+	BettingPro  float64
+}
+
 var ThisWeekDataMap = map[string]string{
 	"HouseName":         "A", //房间名字
 	"HouseCard":         "C", //有效房卡

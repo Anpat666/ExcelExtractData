@@ -189,7 +189,7 @@ func GameCategory(data [][]string) [][]string {
 		gameName := data[0][i]
 		if contains(baccarat, gameName) {
 			dataClass1[i] = "1"
-			dataClass2[i] = "1"
+			dataClass2[i] = "2"
 		}
 		if contains(FastThree, gameName) {
 			dataClass1[i] = "2"
@@ -197,19 +197,19 @@ func GameCategory(data [][]string) [][]string {
 		}
 		if contains(NumFive, gameName) {
 			dataClass1[i] = "2"
-			dataClass2[i] = "5"
+			dataClass2[i] = "4"
 		}
 		if contains(NumTen, gameName) {
 			dataClass1[i] = "2"
-			dataClass2[i] = "10"
+			dataClass2[i] = "1"
 		}
 		if contains(MarkSix, gameName) {
 			dataClass1[i] = "2"
-			dataClass2[i] = "6"
+			dataClass2[i] = "5"
 		}
 		if contains(Other, gameName) {
 			dataClass1[i] = "2"
-			dataClass2[i] = "7"
+			dataClass2[i] = "3"
 		}
 	}
 
@@ -225,4 +225,50 @@ func contains(list []string, target string) bool {
 		}
 	}
 	return false
+}
+
+func GameCategoryRows(data [][]string) [][]string {
+	data[0] = append(data[0], "分类", "细分")
+
+	baccarat := []string{"MC斗牛01", "MC龙虎斗03", "MC斗牛02", "MC百家乐A01", "MC百家乐A04", "MC龙虎斗01",
+		"MC百家乐V01", "MC百家乐V03", "MC百家乐09", "MC百家乐02", "MC真人百家乐", "MC龙虎斗02", "MC百家乐03",
+		"MC百家乐A03", "MC百家乐06", "MC百家乐V02", "MC百家乐05", "MC百家乐V04", "MC百家乐A02", "MC百家乐07",
+		"MC百家乐04", "MC百家乐08", "MC百家乐01"}
+
+	FastThree := []string{"MC十分快三", "MC五分快三", "MC一分快三"}
+	NumFive := []string{"极速时时彩", "MC秒速时时彩", "澳洲幸运5"}
+	NumTen := []string{"MC秒速赛车", "幸运赛车", "澳洲幸运10", "幸运飞艇", "极速赛车", "极速飞艇"}
+	MarkSix := []string{"台湾大乐透", "澳门六合彩", "MC十分六合彩", "香港六合彩", "MC三分六合彩", "台湾六合彩", "MC五分六合彩"}
+	Other := []string{"加拿大PC28"}
+
+	for i := 0; i < len(data); i++ {
+		gameName := data[i][0]
+		if contains(baccarat, gameName) {
+			data[i] = append(data[i], "1")
+			data[i] = append(data[i], "2")
+
+		}
+		if contains(FastThree, gameName) {
+			data[i] = append(data[i], "2")
+			data[i] = append(data[i], "3")
+		}
+		if contains(NumFive, gameName) {
+			data[i] = append(data[i], "2")
+			data[i] = append(data[i], "4")
+		}
+		if contains(NumTen, gameName) {
+			data[i] = append(data[i], "2")
+			data[i] = append(data[i], "1")
+		}
+		if contains(MarkSix, gameName) {
+			data[i] = append(data[i], "2")
+			data[i] = append(data[i], "5")
+		}
+		if contains(Other, gameName) {
+			data[i] = append(data[i], "2")
+			data[i] = append(data[i], "3")
+		}
+	}
+	return data
+
 }

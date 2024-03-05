@@ -158,3 +158,31 @@ func MergeSlice(data1 [][]string, data2 [][]string, data3 [][]string) [][]string
 	}
 	return MergeData
 }
+
+// 二维数组中一维相同下标元素的和值
+func SumColumnRowValues(data [][]string, num int) float64 {
+	var amount float64
+	for i := 0; i < len(data); i++ {
+		bet, _ := strconv.ParseFloat(data[i][num], 64)
+		amount += bet
+	}
+	return amount
+}
+
+func SumColumnRowCategory(data [][]string, num int, class string) float64 {
+	var amount float64
+	for i := 0; i < len(data); i++ {
+		if data[i][10] == class {
+			bet, _ := strconv.ParseFloat(data[i][num], 64)
+			amount += bet
+		}
+	}
+	return amount
+}
+
+func FloatTransformStr(data float64) string {
+	data *= 100
+	str := strconv.FormatFloat(data, 'f', 2, 64)
+	newStr := fmt.Sprintf("%s%%", str)
+	return newStr
+}
